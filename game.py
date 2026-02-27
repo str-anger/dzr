@@ -134,6 +134,7 @@ def get_game_state(team):
         return get_game_state(team)
     hint_index, hint, hint_elapsed, hint_total = get_current_hint(
         stage_data, elapsed)
+    hints_to_show = [h["text"] for h in stage_data["hints"][:hint_index + 1]]
     return {
         "finished": False,
         "stage_id": stage_id,
@@ -141,6 +142,7 @@ def get_game_state(team):
         "stage_time_total": total_time,
         "hint_index": hint_index,
         "hint_text": hint["text"],
+        "hints_list": hints_to_show,
         "hint_time_elapsed": hint_elapsed,
         "hint_time_total": hint_total,
         "code": stage_data["code"]

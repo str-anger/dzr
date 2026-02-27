@@ -27,7 +27,9 @@ margin-bottom: 10px; }
 {{ (state.hint_time_total / 60)|int }}:{{ "%02d"|format(state.hint_time_total % 60) }}
         </div>
         
-        <div class="hint">{{ state.hint_text }}</div>
+        {% for hint_text in state.hints_list %}
+        <div class="hint">{{ hint_text }}</div>
+        {% endfor %}
         
         {% if error %}
         <div class="error">{{ error }}</div>
