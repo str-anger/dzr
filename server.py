@@ -1,3 +1,5 @@
+import sys
+
 from flask import Flask, render_template, request, redirect, make_response
 from datetime import datetime, timedelta
 import game
@@ -72,4 +74,7 @@ def login():
     return render_template("login.html", error=error)
 
 if __name__ == "__main__":
-    app.run(port=8888, debug=True)
+    port = 8888
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    app.run(port=port, debug=True)
