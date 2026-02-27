@@ -6,4 +6,6 @@ if [ ! -d .venv ]; then
     pip install -r requirements.txt
 fi
 source .venv/bin/activate
-python server.py 5000
+# for reverse proxy: base URL;
+# for local server: port number.
+python server.py https://example.com/dzr/ 5000
