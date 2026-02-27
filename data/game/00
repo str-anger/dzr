@@ -1,0 +1,9 @@
+duration: 15
+Welcome to the first stage of the game. Your team must solve the initial puzzle to proceed. Find the hidden clue in the ancient library and decode the secret message.
+---
+
+duration: 20
+You have discovered the first clue. Now travel to the old clocktower and locate the mechanism that opens the secret passage. Time is running out.
+---
+penalty: 5
+code: ALPHA

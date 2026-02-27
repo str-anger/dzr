@@ -1,0 +1,13 @@
+duration: 10
+Stage two begins at the underground vault. Crack the combination lock using the symbols you collected in the previous stage. Work together to align the mechanisms.
+---
+
+duration: 25
+The vault is open. Navigate through the maze of tunnels following the markings on the walls. Watch out for dead ends and remember your path.
+---
+
+duration: 15
+You are near the exit. Solve the final riddle written on the stone tablet to unlock the gate and complete this stage.
+---
+penalty: 10
+code: BETA

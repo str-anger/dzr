@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+    <style>
+        .info { background-color: #e8f4f8; padding: 10px; 
+margin-bottom: 15px; }
+        .hint { background-color: #f0f0f0; padding: 15px; 
+margin-bottom: 15px; white-space: pre-wrap; }
+        .error { background-color: #ffcccc; padding: 10px; 
+margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    {% if state.finished %}
+        <h1>Game Completed!</h1>
+        <div class="hint">{{ state.end_text }}</div>
+    {% else %}
+        <div class="info">
+            <strong>Stage:</strong> {{ state.stage_id }}, 
+<strong>Time:</strong> 
+{{ (state.stage_time_elapsed / 60)|int }}:{{ "%02d"|format(state.stage_time_elapsed % 60) }} / 
+{{ (state.stage_time_total / 60)|int }}:{{ "%02d"|format(state.stage_time_total % 60) }}<br>
+            <strong>Hint:</strong> {{ state.hint_index + 1 }}, 
+<strong>Time:</strong> 
+{{ (state.hint_time_elapsed|int / 60)|int }}:{{ "%02d"|format(state.hint_time_elapsed|int % 60) }} / 
+{{ (state.hint_time_total / 60)|int }}:{{ "%02d"|format(state.hint_time_total % 60) }}
+        </div>
+        
+        <div class="hint">{{ state.hint_text }}</div>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST">
+            <label>Enter code:</label><br>
+            <input type="text" name="code" required autofocus><br><br>
+            <button type="submit">Submit</button>
+        </form>
+    {% endif %}
+</body>
+</html>

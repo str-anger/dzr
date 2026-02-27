@@ -1,0 +1,9 @@
+duration: 30
+The final stage awaits. Assemble all the artifacts you have collected throughout your journey. Each piece must be placed in the correct position on the master board.
+---
+
+duration: 20
+Now activate the ancient device using the combination of all previous codes. The sequence matters - one wrong move will reset everything.
+---
+penalty: 15
+code: GAMMA

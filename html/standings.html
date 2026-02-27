@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Standings</title>
+    <style>
+        table { border-collapse: collapse; margin: 20px; }
+        th, td { border: 1px solid #000; padding: 10px; 
+text-align: center; }
+        th { background-color: #333; color: white; }
+        .notstarted { background-color: white; }
+        .passed { background-color: #90EE90; }
+        .failed { background-color: #FFB6C6; }
+        .progress { background-color: #D3D3D3; }
+    </style>
+</head>
+<body>
+    <h1>Standings</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Team</th>
+                {% if standings and standings[0].stages %}
+                    {% for stage in standings[0].stages %}
+                        <th>{{ stage.stage_id }}</th>
+                    {% endfor %}
+                {% endif %}
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team_data in standings %}
+            <tr>
+                <td><strong>{{ team_data.team }}</strong></td>
+                {% for stage in team_data.stages %}
+                    <td class="{{ stage.status }}">{{ stage.time }}</td>
+                {% endfor %}
+                <td><strong>{{ team_data.total_time }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

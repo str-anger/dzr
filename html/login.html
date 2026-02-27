@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    {% if error %}
+    <div style="background-color: #ffcccc; padding: 10px; 
+margin-bottom: 10px;">{{ error }}</div>
+    {% endif %}
+    <form method="POST">
+        <label>Team:</label><br>
+        <input type="text" name="team" required><br><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
