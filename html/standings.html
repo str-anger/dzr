@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Standings</title>
     <style>
-        table { border-collapse: collapse; margin: 20px; }
-        th, td { border: 1px solid #000; padding: 10px; 
-text-align: center; }
-        th { background-color: #333; color: white; }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 15px; font-size: 16px; }
+        h1 { font-size: 1.8em; margin-bottom: 15px; }
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { border-collapse: collapse; width: 100%; min-width: 300px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 0.9em; }
+        th { background-color: #333; color: white; position: sticky; top: 0; }
+        td:first-child, th:first-child { position: sticky; left: 0; background-color: inherit; z-index: 1; }
+        th:first-child { z-index: 2; }
         .notstarted { background-color: white; }
         .passed { background-color: #90EE90; }
         .failed { background-color: #FFB6C6; }
         .progress { background-color: #D3D3D3; }
+        @media (min-width: 600px) {
+            th, td { padding: 10px; font-size: 1em; }
+        }
     </style>
 </head>
 <body>
     <h1>Standings</h1>
+    <div class="table-container">
     <table>
         <thead>
             <tr>
@@ -39,5 +50,6 @@ text-align: center; }
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </body>
 </html>
