@@ -10,6 +10,7 @@ DURATION_PREFIX = "duration:"
 PENALTY_PREFIX = "penalty:"
 CODE_PREFIX = "code:"
 START_PREFIX = "START"
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIME_FORMAT = "%H:%M:%S"
 SECONDS_PER_MINUTE = 60
 
@@ -56,7 +57,7 @@ def write_progress(team, lines):
 def init_progress(team):
     progress = read_progress(team)
     if not progress:
-        start_time = datetime.now().strftime(TIME_FORMAT)
+        start_time = datetime.now().strftime(DATETIME_FORMAT)
         write_progress(team, [f"{START_PREFIX} {start_time}"])
 
 def get_current_stage_index(team):
@@ -74,10 +75,18 @@ def get_stage_start_time(team):
     start_line = [l for l in progress if l.startswith(START_PREFIX)]
     if not start_line:
         return None
-    start_time_str = start_line[0].split()[1]
-    today = datetime.now().date()
-    start_time = datetime.strptime(start_time_str, TIME_FORMAT)
-    start_datetime = datetime.combine(today, start_time.time())
+    parts = start_line[0].split(None, 1)
+    if len(parts) < 2:
+        return None
+    start_datetime_str = parts[1]
+    if " " in start_datetime_str:
+        start_datetime = datetime.strptime(start_datetime_str, DATETIME_FORMAT)
+    else:
+        start_time = datetime.strptime(start_datetime_str, TIME_FORMAT)
+        now = datetime.now()
+        start_datetime = datetime.combine(now.date(), start_time.time())
+        if start_datetime > now:
+            start_datetime -= timedelta(days=1)
     completed = [l for l in progress if l and not
                  l.startswith(START_PREFIX)]
     for comp in completed:
