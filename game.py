@@ -4,6 +4,7 @@ import os
 GAME_DIR = "data/game"
 TEAMS_DIR = "data/teams"
 PROGRESS_DIR = "data/progress"
+HEADER_FILE = "HEADER"
 SEPARATOR = "---\n"
 DURATION_PREFIX = "duration:"
 PENALTY_PREFIX = "penalty:"
@@ -107,6 +108,14 @@ def get_current_hint(stage_data, elapsed_seconds):
 def get_stage_total_time(stage_data):
     return sum(h["duration"] for h in stage_data["hints"]) * SECONDS_PER_MINUTE
 
+def get_header_text():
+    header_path = f"{GAME_DIR}/{HEADER_FILE}"
+    try:
+        with open(header_path, "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        return ""
+
 def complete_stage(team, stage_id, elapsed_seconds):
     progress = read_progress(team)
     mins = int(elapsed_seconds // SECONDS_PER_MINUTE)
@@ -145,7 +154,10 @@ def get_game_state(team):
         "hints_list": hints_to_show,
         "hint_time_elapsed": hint_elapsed,
         "hint_time_total": hint_total,
-        "code": stage_data["code"]
+        "code": stage_data["code"],
+        "total_stages": len(stages),
+        "total_hints": len(stage_data["hints"]),
+        "header_text": get_header_text()
     }
 
 def check_code(team, submitted_code):
