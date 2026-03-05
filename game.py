@@ -204,6 +204,13 @@ def get_standings():
                      l.startswith(START_PREFIX)]
         stage_results = []
         total_seconds = 0
+        stage_start = get_stage_start_time(team)
+        if stage_start:
+            current_elapsed = int((datetime.now() -
+                                   stage_start).total_seconds())
+        else:
+            current_elapsed = 0
+        found_current = False
         for i, stage_id in enumerate(stages):
             if i < len(completed):
                 parts = completed[i].split()
@@ -227,39 +234,29 @@ def get_standings():
                     "status": status,
                     "time": time_display
                 })
-            elif i == len(completed):
-                stage_start = get_stage_start_time(team)
-                if stage_start:
-                    elapsed = int((datetime.now() -
-                                   stage_start).total_seconds())
-                    stage_data = parse_stage_file(stage_id)
-                    total_time = get_stage_total_time(stage_data)
-                    if elapsed >= total_time:
-                        status = "failed"
-                        display_time = total_time
-                        penalty = stage_data["penalty"]
-                        total_seconds += penalty * SECONDS_PER_MINUTE
-                    else:
-                        status = "progress"
-                        display_time = elapsed
-                        penalty = 0
-                    total_seconds += display_time
-                    mins = display_time // SECONDS_PER_MINUTE
-                    secs = display_time % SECONDS_PER_MINUTE
-                    time_str = f"{mins:02d}:{secs:02d}"
-                    if penalty:
-                        time_str += f" (+{penalty})"
-                    stage_results.append({
-                        "stage_id": stage_id,
-                        "status": status,
-                        "time": time_str
-                    })
+            elif not found_current and stage_start:
+                stage_data = parse_stage_file(stage_id)
+                total_time = get_stage_total_time(stage_data)
+                if current_elapsed >= total_time:
+                    status = "failed"
+                    penalty = stage_data["penalty"]
+                    total_seconds += total_time + penalty * SECONDS_PER_MINUTE
+                    mins = total_time // SECONDS_PER_MINUTE
+                    secs = total_time % SECONDS_PER_MINUTE
+                    time_str = f"{mins:02d}:{secs:02d} (+{penalty})"
+                    current_elapsed -= total_time
                 else:
-                    stage_results.append({
-                        "stage_id": stage_id,
-                        "status": "notstarted",
-                        "time": ""
-                    })
+                    status = "progress"
+                    total_seconds += current_elapsed
+                    mins = current_elapsed // SECONDS_PER_MINUTE
+                    secs = current_elapsed % SECONDS_PER_MINUTE
+                    time_str = f"{mins:02d}:{secs:02d}"
+                    found_current = True
+                stage_results.append({
+                    "stage_id": stage_id,
+                    "status": status,
+                    "time": time_str
+                })
             else:
                 stage_results.append({
                     "stage_id": stage_id,
