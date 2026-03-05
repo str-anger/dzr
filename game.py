@@ -225,12 +225,17 @@ def get_standings():
                 if stage_start:
                     elapsed = int((datetime.now() -
                                    stage_start).total_seconds())
-                    total_seconds += elapsed
-                    mins = elapsed // SECONDS_PER_MINUTE
-                    secs = elapsed % SECONDS_PER_MINUTE
                     stage_data = parse_stage_file(stage_id)
                     total_time = get_stage_total_time(stage_data)
-                    status = "failed" if elapsed >= total_time else "progress"
+                    if elapsed >= total_time:
+                        status = "failed"
+                        display_time = total_time
+                    else:
+                        status = "progress"
+                        display_time = elapsed
+                    total_seconds += display_time
+                    mins = display_time // SECONDS_PER_MINUTE
+                    secs = display_time % SECONDS_PER_MINUTE
                     stage_results.append({
                         "stage_id": stage_id,
                         "status": status,
