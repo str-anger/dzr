@@ -14,10 +14,51 @@
         input[type="text"], input[type="password"] { width: 100%; padding: 16px; font-size: 20px; border: 2px solid #ccc; border-radius: 5px; margin-bottom: 15px; }
         button { width: 100%; padding: 18px; font-size: 1.2em; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         button:active { background-color: #45a049; }
+        .rules-header { cursor: pointer; padding: 15px; background-color: #f0f0f0; border: 2px solid #ccc; border-radius: 5px; font-weight: bold; font-size: 1.1em; margin-bottom: 15px; }
+        .rules-header:active { background-color: #e0e0e0; }
+        .rules-content { display: none; padding: 15px; border: 2px solid #ccc; border-top: none; border-radius: 0 0 5px 5px; margin-top: -15px; margin-bottom: 15px; }
+        .rules-content.open { display: block; width: 100vw; margin-left: calc(-50vw + 50%); }
     </style>
+    <script>
+        function toggleRules() {
+            var content = document.getElementById("rules-content");
+            content.classList.toggle("open");
+        }
+    </script>
 </head>
 <body>
     <h1>Login</h1>
+    <div class="rules-header" onclick="toggleRules()">Rules ▼</div>
+    <div id="rules-content" class="rules-content">
+        This game engine is inspired by DozoR
+        (<a href="https://en.wikipedia.org/wiki/Dozor">[en]</a>,
+        <a href="https://ru.wikipedia.org/wiki/DozoR">[ru]</a>).
+        The goal is to solve puzzles in limited time and then find a code hidden somewhere in real world.
+        Answer to the puzzle
+        is usually a location in predefined area (town, neighbourhood, region).
+        After solving, you should come to this location and find an alphanumeric <b>code</b>.
+        Enter this code in the input field to complete the stage.
+        <br><br>
+        <i>
+            <b>Example hint for a game in Dublin (example of predefined area)</b>:
+            And now draw a rectangle around this church.
+            Ok, now try to follow the sun, but do not cross the line!
+            Didn't you know you may even see Chelmsford from here?
+            <br><br>
+            <b>Solution:</b> Look for weird things. (Rectangle = Bar, Church = Temple) = Temple Bar.
+            Temple bar is the area on the south bank of river Liffey.
+            "Follow the sun" = go west. Chelmsford is the main city of Essex.
+            So, you should do to the west of Temple Bar, and search on the intersection
+            with Essex street.
+        </i>
+        <br><br>
+        <b>Code</b>. The code may be written on the wall, or may be encoded with an object
+        (e.g. if you see <b>T34</b> tank or BMW <b>X5</b> in front of you, guess the code).
+        <br><br>
+        One location (stage) may have multiple hints which will open with time on the page.
+        <b>Refresh the page to get hints and time updates</b>. If time is up, you will be sent
+        to the next stage. If all stages are finished, you will receive final instructions (e.g. assembly point).
+    </div>
     {% if error %}
     <div class="error">{{ error }}</div>
     {% endif %}
