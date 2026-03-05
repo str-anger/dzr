@@ -16,6 +16,12 @@ BASE_URL = ""
 
 app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
 
+def clear_cookies_and_redirect():
+    resp = make_response(redirect(f"{BASE_URL}/login"))
+    resp.set_cookie(COOKIE_TEAM, "", expires=0)
+    resp.set_cookie(COOKIE_PASSWORD, "", expires=0)
+    return resp
+
 def check_auth(team, password):
     with open(PASSWD_FILE, "r") as f:
         for line in f:
@@ -32,6 +38,8 @@ def index():
     password = request.cookies.get(COOKIE_PASSWORD)
     if not team or not password or not check_auth(team, password):
         return redirect(f"{BASE_URL}/login")
+    if not game.has_team_file(team):
+        return clear_cookies_and_redirect()
     error = None
     if request.method == "POST":
         code = request.form.get("code", "")
