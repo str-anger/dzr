@@ -33,31 +33,47 @@
         This game engine is inspired by DozoR
         (<a href="https://en.wikipedia.org/wiki/Dozor">[en]</a>,
         <a href="https://ru.wikipedia.org/wiki/DozoR">[ru]</a>).
-        The goal is to solve puzzles in limited time and then find a code hidden somewhere in real world.
+        There are usually a few <b>stages</b>.
+        The goal of each stage is to solve <b>puzzles</b> in limited time
+        and then find a <b>code</b> hidden somewhere in real world.
         Answer to the puzzle
         is usually a location in predefined area (town, neighbourhood, region).
-        After solving, you should come to this location and find an alphanumeric <b>code</b>.
+        After solving a puzzle, you should come to this location and find an alphanumeric <b>code</b>.
         Enter this code in the input field to complete the stage.
         <br><br>
+        <b>Puzzle</b> example<br>
         <i>
-            <b>Example hint for a game in Dublin (example of predefined area)</b>:
+            <b>Example puzzle for a game in Dublin (example of predefined area)</b>:<br>
             And now draw a rectangle around this church.
             Ok, now try to follow the sun, but do not cross the line!
             Didn't you know you may even see Chelmsford from here?
             <br><br>
-            <b>Solution:</b> Look for weird things. (Rectangle = Bar, Church = Temple) = Temple Bar.
+            <b>Solution:</b><br>Look for weird things. (Rectangle = Bar, Church = Temple) = Temple Bar.
             Temple bar is the area on the south bank of river Liffey.
             "Follow the sun" = go west. Chelmsford is the main city of Essex.
             So, you should go to the west of Temple Bar, and search on the intersection
             with Essex street.
         </i>
         <br><br>
-        <b>Code</b>. The code may be written on the wall, or may be encoded with an object
+        <b>Code</b><br>The code may be written on a wall, or may be encoded with an object
         (e.g. if you see <b>T34</b> tank or BMW <b>X5</b> in front of you, guess the code).
         <br><br>
         One location (stage) may have multiple hints which will open with time on the page.
         <b>Refresh the page to get hints and time updates</b>. If time is up, you will be sent
         to the next stage. If all stages are finished, you will receive final instructions (e.g. assembly point).
+        <br><br>
+        <b>Complexity</b><br>Each task has a complexity, consisting of a number (1,2,3) and optional "+".
+        Here "1" means code is on the ground level, in obvious place.
+        "2" means a bit of climbing (1 floor, slide on a playground).
+        "3" means physical skills required, may be dangerous.
+        "+" means "hidden, hard to find".
+        <br><br>
+        <b>Complexity</b> examples:
+        <ul>
+            <li>1+: under the bench in small letters</li>
+            <li>2: under the bridge, on the pillar</li>
+            <li>3+: under the bridge, but over the water</li>
+        </ul>
     </div>
     {% if error %}
     <div class="error">{{ error }}</div>
