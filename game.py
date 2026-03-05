@@ -146,7 +146,7 @@ def get_game_state(team):
     elapsed = int((now - stage_start).total_seconds())
     total_time = get_stage_total_time(stage_data)
     if elapsed >= total_time:
-        complete_stage(team, stage_id, elapsed)
+        complete_stage(team, stage_id, total_time)
         return get_game_state(team)
     hint_index, hint, hint_elapsed, hint_total = get_current_hint(
         stage_data, elapsed)
