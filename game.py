@@ -214,11 +214,18 @@ def get_standings():
                 elapsed_secs = (int(time_parts[0]) * SECONDS_PER_MINUTE +
                                 int(time_parts[1]))
                 total_seconds += elapsed_secs
-                status = "failed" if elapsed_secs >= total_time else "passed"
+                if elapsed_secs >= total_time:
+                    status = "failed"
+                    penalty = stage_data["penalty"]
+                    total_seconds += penalty * SECONDS_PER_MINUTE
+                    time_display = f"{stage_time} (+{penalty})"
+                else:
+                    status = "passed"
+                    time_display = stage_time
                 stage_results.append({
                     "stage_id": stage_id,
                     "status": status,
-                    "time": stage_time
+                    "time": time_display
                 })
             elif i == len(completed):
                 stage_start = get_stage_start_time(team)
@@ -230,16 +237,22 @@ def get_standings():
                     if elapsed >= total_time:
                         status = "failed"
                         display_time = total_time
+                        penalty = stage_data["penalty"]
+                        total_seconds += penalty * SECONDS_PER_MINUTE
                     else:
                         status = "progress"
                         display_time = elapsed
+                        penalty = 0
                     total_seconds += display_time
                     mins = display_time // SECONDS_PER_MINUTE
                     secs = display_time % SECONDS_PER_MINUTE
+                    time_str = f"{mins:02d}:{secs:02d}"
+                    if penalty:
+                        time_str += f" (+{penalty})"
                     stage_results.append({
                         "stage_id": stage_id,
                         "status": status,
-                        "time": f"{mins:02d}:{secs:02d}"
+                        "time": time_str
                     })
                 else:
                     stage_results.append({
