@@ -10,6 +10,8 @@
         h1 { font-size: 1.8em; margin-bottom: 15px; }
         .logout-btn { position: fixed; top: 5px; right: 5px; width: 40px; height: 40px; padding: 0; font-size: 0.8em; background-color: rgba(244, 67, 54, 0.5); color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 1000; }
         .logout-btn:active { background-color: rgba(211, 47, 47, 0.7); }
+        .gps-btn { position: fixed; top: 5px; left: 5px; width: 40px; height: 40px; padding: 0; font-size: 0.6em; background-color: rgba(33, 150, 243, 0.5); color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 1000; }
+        .gps-btn:active { background-color: rgba(25, 118, 210, 0.7); }
         .info { background-color: #e8f4f8; padding: 15px; margin-bottom: 15px; border-radius: 5px; line-height: 1.6; font-size: 1em; }
         .hint { background-color: #f0f0f0; padding: 15px; margin-bottom: 15px; white-space: pre-wrap; border-radius: 5px; word-wrap: break-word; font-size: 1em; }
         .error { background-color: #ffcccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; font-size: 1em; }
@@ -23,14 +25,37 @@
         }
     </style>
     <script>
+        var teamName = "{{ state.team }}";
         function logout() {
             document.cookie = "team=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             window.location.reload();
         }
+        function sendGps() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                var lat = pos.coords.latitude;
+                var lon = pos.coords.longitude;
+                fetch("/where?team=" + encodeURIComponent(teamName) + "&lat=" + lat + "&lon=" + lon);
+            });
+        }
+        function reportGps() {
+            sendGps();
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            sendGps();
+            setInterval(sendGps, 300000);
+            var form = document.querySelector("form");
+            if (form) {
+                form.addEventListener("submit", function() {
+                    sendGps();
+                });
+            }
+        });
     </script>
 </head>
 <body>
+    <button class="gps-btn" onclick="reportGps()">report GPS</button>
     <button class="logout-btn" onclick="logout()">log out</button>
     {% if state.finished %}
         <h1>Game Completed!</h1>
@@ -41,28 +66,28 @@
             Timers are static. Update the page to update timer values.<br>
             <hr>
             <strong>Total stages:</strong> {{ state.total_stages }}, <strong>Hints in this stage:</strong> {{ state.total_hints }}<br>
-            <strong>Stage ID (unordered):</strong> {{ state.stage_id }}, 
-<strong>Time at this stage:</strong> 
-{{ (state.stage_time_elapsed / 60)|int }}:{{ "%02d"|format(state.stage_time_elapsed % 60) }} / 
+            <strong>Stage ID (unordered):</strong> {{ state.stage_id }},
+<strong>Time at this stage:</strong>
+{{ (state.stage_time_elapsed / 60)|int }}:{{ "%02d"|format(state.stage_time_elapsed % 60) }} /
 {{ (state.stage_time_total / 60)|int }}:{{ "%02d"|format(state.stage_time_total % 60) }}<br>
-            <strong>Hint number in this stage:</strong> {{ state.hint_index + 1 }}, 
-<strong>Time at this hint:</strong> 
-{{ (state.hint_time_elapsed|int / 60)|int }}:{{ "%02d"|format(state.hint_time_elapsed|int % 60) }} / 
+            <strong>Hint number in this stage:</strong> {{ state.hint_index + 1 }},
+<strong>Time at this hint:</strong>
+{{ (state.hint_time_elapsed|int / 60)|int }}:{{ "%02d"|format(state.hint_time_elapsed|int % 60) }} /
 {{ (state.hint_time_total / 60)|int }}:{{ "%02d"|format(state.hint_time_total % 60) }}
         </div>
-        
+
         {% if state.header_text %}
         <div class="hint">{{ state.header_text|safe }}</div>
         {% endif %}
-        
+
         {% for hint_text in state.hints_list %}
         <div class="hint">{{ hint_text|safe }}</div>
         {% endfor %}
-        
+
         {% if error %}
         <div class="error">{{ error }}</div>
         {% endif %}
-        
+
         <form method="POST">
             <label>Enter code:</label><br>
             <input type="text" name="code" required autofocus><br><br>

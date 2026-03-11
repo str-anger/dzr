@@ -23,13 +23,16 @@ def clear_cookies_and_redirect():
     return resp
 
 def check_auth(team, password):
-    with open(PASSWD_FILE, "r") as f:
-        for line in f:
-            line = line.strip()
-            if ":" in line:
-                login, passwd = line.split(":", 1)
-                if login == team and passwd == password:
-                    return True
+    try:
+        with open(PASSWD_FILE, "r") as f:
+            for line in f:
+                line = line.strip()
+                if ":" in line:
+                    login, passwd = line.split(":", 1)
+                    if login == team and passwd == password:
+                        return True
+    except FileNotFoundError:
+        pass
     return False
 
 @app.route("/", methods=["GET", "POST"])
@@ -60,6 +63,41 @@ def standings():
         return redirect(f"{BASE_URL}/")
     standings_data = game.get_standings()
     return render_template("standings.html", standings=standings_data)
+
+@app.route("/where")
+def where():
+    try:
+        team = request.args.get("team", "")
+        lat = request.args.get("lat", "")
+        lon = request.args.get("lon", "")
+        if team and lat and lon:
+            lat_f = float(lat)
+            lon_f = float(lon)
+            game.save_location(team, lat_f, lon_f)
+            return "ok"
+    except Exception as e:
+        print(f"/where error: {e}")
+    return "error"
+
+@app.route("/map")
+def map_page():
+    markers = []
+    try:
+        from datetime import datetime
+        locations = game.get_team_locations()
+        now = datetime.now()
+        for team, points in locations.items():
+            for p in points:
+                mins = int((now - p["ts"]).total_seconds() // 60)
+                markers.append({
+                    "team": team,
+                    "lat": p["lat"],
+                    "lon": p["lon"],
+                    "mins": mins
+                })
+    except Exception as e:
+        print(f"/map error: {e}")
+    return render_template("map.html", markers=markers)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

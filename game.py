@@ -4,6 +4,8 @@ import os
 GAME_DIR = "data/game"
 TEAMS_DIR = "data/teams"
 PROGRESS_DIR = "data/progress"
+WHERE_DIR = "data/where"
+LOCATION_MINUTES = 15
 HEADER_FILE = "HEADER"
 SEPARATOR = "---\n"
 DURATION_PREFIX = "duration:"
@@ -137,7 +139,7 @@ def get_game_state(team):
     stage_index = get_current_stage_index(team)
     if stage_index == -1:
         with open(f"{GAME_DIR}/END", "r") as f:
-            return {"finished": True, "end_text": f.read()}
+            return {"finished": True, "end_text": f.read(), "team": team}
     stages = get_team_stages(team)
     stage_id = stages[stage_index]
     stage_data = parse_stage_file(stage_id)
@@ -164,7 +166,8 @@ def get_game_state(team):
         "code": stage_data["code"],
         "total_stages": len(stages),
         "total_hints": len(stage_data["hints"]),
-        "header_text": get_header_text()
+        "header_text": get_header_text(),
+        "team": team
     }
 
 def check_code(team, submitted_code):
@@ -193,6 +196,62 @@ def has_team_file(team):
             return True
     except FileNotFoundError:
         return False
+
+def save_location(team, lat, lon):
+    try:
+        os.makedirs(WHERE_DIR, exist_ok=True)
+        timestamp = datetime.now().strftime(DATETIME_FORMAT)
+        with open(f"{WHERE_DIR}/{team}", "a") as f:
+            f.write(f"{timestamp} {lat} {lon}\n")
+    except Exception as e:
+        print(f"save_location error: {e}")
+
+def get_team_locations():
+    locations = {}
+    try:
+        now = datetime.now()
+        cutoff = now - timedelta(minutes=LOCATION_MINUTES)
+        try:
+            teams = os.listdir(WHERE_DIR)
+        except FileNotFoundError:
+            return locations
+        for team in teams:
+            if team.startswith("."):
+                continue
+            try:
+                with open(f"{WHERE_DIR}/{team}", "r") as f:
+                    lines = [l.strip() for l in f if l.strip()]
+            except FileNotFoundError:
+                continue
+            if not lines:
+                continue
+            recent = []
+            for line in lines:
+                parts = line.split()
+                if len(parts) >= 4:
+                    ts_str = f"{parts[0]} {parts[1]}"
+                    try:
+                        ts = datetime.strptime(ts_str, DATETIME_FORMAT)
+                        lat, lon = float(parts[2]), float(parts[3])
+                        if ts >= cutoff:
+                            recent.append({"ts": ts, "lat": lat, "lon": lon})
+                    except ValueError:
+                        continue
+            if recent:
+                locations[team] = recent
+            else:
+                parts = lines[-1].split()
+                if len(parts) >= 4:
+                    ts_str = f"{parts[0]} {parts[1]}"
+                    try:
+                        ts = datetime.strptime(ts_str, DATETIME_FORMAT)
+                        lat, lon = float(parts[2]), float(parts[3])
+                        locations[team] = [{"ts": ts, "lat": lat, "lon": lon}]
+                    except ValueError:
+                        pass
+    except Exception as e:
+        print(f"get_team_locations error: {e}")
+    return locations
 
 def get_standings():
     teams = get_all_teams()
