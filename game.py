@@ -156,6 +156,7 @@ def get_game_state(team):
     return {
         "finished": False,
         "stage_id": stage_id,
+        "stage_number": stage_index + 1,
         "stage_time_elapsed": elapsed,
         "stage_time_total": total_time,
         "hint_index": hint_index,
