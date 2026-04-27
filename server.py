@@ -73,7 +73,8 @@ def where():
         if team and lat and lon:
             lat_f = float(lat)
             lon_f = float(lon)
-            game.save_location(team, lat_f, lon_f)
+            if not game.save_location(team, lat_f, lon_f):
+                return "forbidden", 403
             return "ok"
     except Exception as e:
         print(f"/where error: {e}")
@@ -98,6 +99,17 @@ def map_page():
     except Exception as e:
         print(f"/map error: {e}")
     return render_template("map.html", markers=markers)
+
+@app.route("/finish_game", methods=["POST"])
+def finish_game():
+    team = request.cookies.get(COOKIE_TEAM)
+    password = request.cookies.get(COOKIE_PASSWORD)
+    if not team or not password or not check_auth(team, password):
+        return redirect(f"{BASE_URL}/login")
+    if game.has_team_file(team):
+        return redirect(f"{BASE_URL}/")
+    game.finish_game()
+    return redirect(f"{BASE_URL}/standings")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

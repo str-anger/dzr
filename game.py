@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+import yaml
 
 GAME_DIR = "data/game"
 TEAMS_DIR = "data/teams"
@@ -7,6 +8,7 @@ PROGRESS_DIR = "data/progress"
 WHERE_DIR = "data/where"
 LOCATION_MINUTES = 15
 HEADER_FILE = "HEADER"
+STATUS_FILE = "data/game/status.yaml"
 SEPARATOR = "---\n"
 DURATION_PREFIX = "duration:"
 PENALTY_PREFIX = "penalty:"
@@ -15,6 +17,46 @@ START_PREFIX = "START"
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 TIME_FORMAT = "%H:%M:%S"
 SECONDS_PER_MINUTE = 60
+
+def get_game_status() -> dict:
+    try:
+        with open(STATUS_FILE, "r") as f:
+            data = yaml.safe_load(f)
+            return data if data else {}
+    except FileNotFoundError:
+        return {}
+    except Exception:
+        return {}
+
+def is_game_ended():
+    return get_game_status().get("status", "") == "ended"
+
+def finish_game():
+    data = get_game_status()
+    data["status"] = "ended"
+    os.makedirs(os.path.dirname(STATUS_FILE), exist_ok=True)
+    with open(STATUS_FILE, "w") as f:
+        yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
+    teams = get_all_teams()
+    for team in teams:
+        complete_all_stages(team)
+
+def complete_all_stages(team):
+    stages = get_team_stages(team)
+    progress = read_progress(team)
+    if not progress:
+        return
+    completed = [l for l in progress if l and not l.startswith(START_PREFIX)]
+    if len(completed) >= len(stages):
+        return
+    for i in range(len(completed), len(stages)):
+        stage_id = stages[i]
+        stage_data = parse_stage_file(stage_id)
+        max_time = get_stage_total_time(stage_data)
+        mins = max_time // SECONDS_PER_MINUTE
+        secs = max_time % SECONDS_PER_MINUTE
+        progress.append(f"{stage_id} {mins:02d}:{secs:02d}")
+    write_progress(team, progress)
 
 def parse_stage_file(stage_id):
     with open(f"{GAME_DIR}/{stage_id}", "r") as f:
@@ -135,6 +177,9 @@ def complete_stage(team, stage_id, elapsed_seconds):
     write_progress(team, progress)
 
 def get_game_state(team):
+    if is_game_ended():
+        with open(f"{GAME_DIR}/END", "r") as f:
+            return {"finished": True, "end_text": f.read(), "team": team}
     init_progress(team)
     stage_index = get_current_stage_index(team)
     if stage_index == -1:
@@ -199,13 +244,17 @@ def has_team_file(team):
         return False
 
 def save_location(team, lat, lon):
+    if is_game_ended():
+        return False
     try:
         os.makedirs(WHERE_DIR, exist_ok=True)
         timestamp = datetime.now().strftime(DATETIME_FORMAT)
         with open(f"{WHERE_DIR}/{team}", "a") as f:
             f.write(f"{timestamp} {lat} {lon}\n")
+        return True
     except Exception as e:
         print(f"save_location error: {e}")
+        return False
 
 def get_team_locations():
     locations = {}
