@@ -18,11 +18,13 @@
     <script>
         var markers = {{ markers|tojson }};
         var cambridge = [52.2053, 0.1218];
+        var imageUrl = "https://www.orangesmile.com/common/img_city_maps/cambridge-map-0.jpg";
+        var southWest = [52.165745, 0.071328];
+        var northEast = [52.239594, 0.194096];
+        var bounds = [southWest, northEast];
         var map = L.map("map");
-        L.tileLayer("https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png", {
-            maxZoom: 20,
-            attribution: "CyclOSM"
-        }).addTo(map);
+        L.imageOverlay(imageUrl, bounds).addTo(map);
+        map.fitBounds(bounds);
         var colors = ["#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4",
                       "#42d4f4", "#f032e6", "#bfef45", "#fabed4", "#469990"];
         var teamColors = {};
@@ -54,18 +56,18 @@
                 });
         }
         if (allPos.length === 0) {
-            map.setView(cambridge, 13);
+            map.fitBounds(bounds);
         } else if (allPos.length === 1) {
             var p = allPos[0];
             var pad = 0.009;
             map.fitBounds([[p[0] - pad, p[1] - pad * 1.6], [p[0] + pad, p[1] + pad * 1.6]]);
         } else {
-            var bounds = L.latLngBounds(allPos);
-            bounds = bounds.pad(0.1);
+            var markerBounds = L.latLngBounds(allPos);
+            markerBounds = markerBounds.pad(0.1);
             var latPad = 0.0045;
             var lonPad = 0.0073;
-            var sw = bounds.getSouthWest();
-            var ne = bounds.getNorthEast();
+            var sw = markerBounds.getSouthWest();
+            var ne = markerBounds.getNorthEast();
             map.fitBounds([[sw.lat - latPad, sw.lng - lonPad], [ne.lat + latPad, ne.lng + lonPad]]);
         }
     </script>
